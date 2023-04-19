@@ -17,18 +17,34 @@ var app = builder.Build();
 var scope = app.Services.CreateScope();
 var db = scope.ServiceProvider.GetService<TodoContext>();
 
+DbInitializer.Initialize(db);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    
 }
+
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseRouting();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapControllerRoute(
+        name: "GetTodoItem",
+        pattern: "api/todoitems/{id}",
+        defaults: new { controller = "TodoItems", action = "GetTodoItemAsync" }
+    );
+});
+
+
 
 app.Run();
 
